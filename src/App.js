@@ -3,8 +3,9 @@ import {useEffect, useState} from "react";
 
 function App() {
     const [posts, setPosts] = useState([]);
-    let title, description, comment = '';
-
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("");
+    const [comment, setComment] = useState("");
     useEffect(() => {
         (async () => {
             const response = await fetch('http://localhost:8000/api/posts');
@@ -15,7 +16,7 @@ function App() {
         })()
     }, []);
 
-    const createPost = async e => {
+    let createPost = async (e) => {
         e.preventDefault();
 
         const res = await fetch('http://localhost:8000/api/posts', {
@@ -27,12 +28,14 @@ function App() {
             })
         });
 
+        setTitle("");
+        setDescription("");
         const createdPost = await res.json();
-
+  
         setPosts([...posts, createdPost]);
     }
 
-    const createComment = async (e, post_id) => {
+    let createComment = async (e, post_id) => {
         e.preventDefault();
 
         const response = await fetch('http://localhost:8001/api/comments', {
@@ -43,10 +46,8 @@ function App() {
                 text: comment
             })
         });
-
+        setComment("");
         const createdComment = await response.json();
-
-        comment = ''
 
         setPosts(posts.map(p => {
             if (p.id === post_id) {
@@ -63,9 +64,8 @@ function App() {
                 <div className="col-4">
                     <h2>Create a Post</h2>
 
-                    <input className="form-control mb-3" onChange={e => title = e.target.value}/>
-                    <textarea className="form-control mb-3" onChange={e => description = e.target.value}/>
-
+                    <input className="form-control mb-3"   value={title} onChange={(e) => setTitle(e.target.value) }/>
+                    <textarea className="form-control mb-3" value={description} onChange={(e) => setDescription(e.target.value) }/>
                     <button className="btn btn-primary" type="submit">Save</button>
                 </div>
             </form>
@@ -82,9 +82,9 @@ function App() {
                                         </div>
                                         <div className="card-body">
                                             <p className="card-title pricing-card-title">{post.description}</p>
-                                            <form onSubmit={e => createComment(e, post.id)}>
-                                                <input className="w-100 form-control"
-                                                       onChange={e => comment = e.target.value}/>
+                                            <form onSubmit={(e) => createComment(e, post.id)}>
+                                                <input className="w-100 form-control" 
+                                                       onChange={e => setComment(e.target.value) }/>
                                             </form>
                                         </div>
                                         {post.comments && post.comments.map(
